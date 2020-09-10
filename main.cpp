@@ -2,24 +2,21 @@
 #include <cassert>
 #include <cstdlib>
 #include <ctime>
+#include <cstdio>
+#include "globals.h"
+#include "graphics.h"
+
+void* pBitmap = nullptr;
+int bmpMemSize = 0;
+int bmpWidth = 0;
+int bmpHeight = 0;
+HDC hdc = nullptr;
+BITMAPINFO bi = {0};
 
 static const char* CLASS_NAME = "gditest";
 static const char* WND_NAME = "GDI test";
-static void* pBitmap = nullptr;
-static int bmpMemSize = 0;
-static int bmpWidth;
-static int bmpHeight;
-static BITMAPINFO bi = {0};
 static PAINTSTRUCT ps;
-static int counter = 0;
-static HDC hdc;
 
-void OnPaint(HWND hwnd);
-void PutPixel(int x, int y, unsigned int color);
-void Update();
-void Render();
-void StartFrame();
-void EndFrame();
 void Go()
 {
 	StartFrame();
@@ -29,7 +26,7 @@ void Go()
 }
 
 void Register();
-HWND Create();
+HWND Create(int width = CW_USEDEFAULT, int height = CW_USEDEFAULT);
 
 LRESULT CALLBACK WndProc(HWND, UINT, WPARAM, LPARAM);
 
@@ -40,7 +37,7 @@ int WINAPI WinMain(
 	int)
 {
 	Register();
-	HWND hwnd = Create();
+	HWND hwnd = Create(640, 480);
 	assert(hwnd != nullptr);
 	
 	ShowWindow(hwnd, SW_SHOWDEFAULT);
@@ -48,7 +45,10 @@ int WINAPI WinMain(
 	
 	MSG msg = {0};
 	BOOL bRet = TRUE;
-	
+	clock_t start;
+	clock_t end;
+	float fps;
+		
 	while(bRet)
 	{
 		while(PeekMessage(&msg, nullptr, 0, 0, PM_REMOVE))
@@ -63,7 +63,21 @@ int WINAPI WinMain(
 			break;
 		}
 		
+		start = clock();
+		
 		Go();
+		
+		end = clock() - start;
+		
+		if(end > 0)
+		{
+			fps = (float)(CLOCKS_PER_SEC / end);
+		}
+		
+		char buffer[60] = {0};
+		sprintf(buffer, "%s - FPS: %.2f", WND_NAME, fps);
+		SetWindowText(hwnd, buffer);
+		
 	}
 	
 	return msg.wParam;
@@ -83,8 +97,16 @@ void Register()
 	assert(RegisterClassEx(&wcx) != 0);
 }
 
-HWND Create()
+HWND Create(int width, int height)
 {
+	RECT rc;
+	rc.top = 0;
+	rc.left = 0;
+	rc.right = width;
+	rc.bottom = height;
+	
+	AdjustWindowRect(&rc, WS_OVERLAPPEDWINDOW &~WS_SIZEBOX &~ WS_MAXIMIZEBOX, FALSE);
+
 	return CreateWindowEx(
 		WS_EX_CLIENTEDGE,
 		CLASS_NAME,
@@ -92,8 +114,8 @@ HWND Create()
 		WS_OVERLAPPEDWINDOW &~WS_SIZEBOX &~ WS_MAXIMIZEBOX,
 		CW_USEDEFAULT,
 		CW_USEDEFAULT,
-		CW_USEDEFAULT,
-		CW_USEDEFAULT,
+		rc.right - rc.left,
+		rc.bottom - rc.top,
 		nullptr,
 		nullptr,
 		GetModuleHandle(nullptr),
@@ -134,51 +156,4 @@ LRESULT CALLBACK WndProc(HWND hwnd, UINT msg, WPARAM wparam, LPARAM lparam)
 	}
 	
 	return DefWindowProc(hwnd, msg, wparam, lparam);
-}
-
-void PutPixel(int x, int y, unsigned int color)
-{
-	unsigned long* pixel = (unsigned long*)pBitmap;
-	
-  *(pixel + (y * bmpWidth + x)) =  color;
-}
-
-void StartFrame()
-{
-	memset(pBitmap, 0, bmpMemSize);
-}
-
-void EndFrame()
-{	
-	// copy to front buffer
-	StretchDIBits(
-		hdc,
-		0,
-		0,
-		bmpWidth,
-		bmpHeight,
-		0,
-		0,
-		bmpWidth,
-		bmpHeight,
-		pBitmap,
-		&bi,
-		DIB_RGB_COLORS,
-		SRCCOPY);
-}
-
-void Update()
-{
-	counter++;
-}
-
-void Render()
-{	
-	for(int y = 0; y < bmpHeight; ++y)
-	{
-		for(int x = 0; x < bmpWidth; ++x)
-		{
-			PutPixel(x, y, RGB(rand() % 256, rand() % 256, rand() % 256));
-		}
-	}
 }

@@ -1,6 +1,5 @@
 #pragma once
 // graphics
-#include "globals.h"
 
 void Update();
 void Render();
@@ -9,3 +8,5 @@ void EndFrame();
 
 // drawing routines
 void PutPixel(int x, int y, unsigned int color);
+void DrawRect( int x0,int y0,int x1,int y1,unsigned int c );
+void DrawRectDim( int x0,int y0,int width,int height,unsigned int c );
