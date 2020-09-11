@@ -11,6 +11,7 @@ static int x = 0;
 static int y = 0;
 static int dirx = 1;
 static int diry = 1;
+unsigned int* pixel = nullptr;
 
 void swap(int& a, int& b)
 {
@@ -26,9 +27,8 @@ void PutPixel(int x, int y, unsigned int color)
 	assert(y >= 0);
 	assert(y < bmpHeight);
 	
-	unsigned int* pixel = (unsigned int*)pBitmap;
-	
-  *(pixel + (y * bmpWidth + x)) =  color;
+	pixel = (unsigned int*)pBitmap;
+	pixel[y * bmpWidth + x] = color;
 }
 
 void StartFrame()
@@ -78,9 +78,9 @@ void Update()
 		x = 0;
 		dirx = 1;
 	}
-	else if(x >= (bmpWidth - 200))
+	else if(x >= (bmpWidth - 100))
 	{
-		x = bmpWidth - 200;
+		x = bmpWidth - 100;
 		dirx = -1;
 	}
 	
@@ -106,7 +106,8 @@ void Render()
 		}
 	} */
 	unsigned int color = rand() % 0xFFFFFF;
-	DrawRectDim(x, y, 200, 100, color);
+	DrawRectDim(x, y, 100, 100, color);
+	//DrawCircle(x, y, 50, color);
 }
 
 void DrawRect( int x0,int y0,int x1,int y1, unsigned int c )
@@ -128,7 +129,25 @@ void DrawRect( int x0,int y0,int x1,int y1, unsigned int c )
 		}
 	}
 }
+
 void DrawRectDim( int x0,int y0,int width,int height, unsigned int c )
 {
 	DrawRect( x0,y0,x0 + width,y0 + height,c );
+}
+
+void DrawCircle( int x,int y,int radius,unsigned int c )
+{
+	const int rad_sq = radius * radius;
+	for( int y_loop = y - radius + 1; y_loop < y + radius; y_loop++ )
+	{		
+		for( int x_loop = x - radius + 1; x_loop < x + radius; x_loop++ )
+		{
+			const int x_diff = x - x_loop;
+			const int y_diff = y - y_loop;
+			if( x_diff * x_diff + y_diff * y_diff <= rad_sq )
+			{
+				PutPixel( x_loop,y_loop,c );
+			}
+		}
+	}
 }

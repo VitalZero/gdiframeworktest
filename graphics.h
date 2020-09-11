@@ -10,3 +10,4 @@ void EndFrame();
 void PutPixel(int x, int y, unsigned int color);
 void DrawRect( int x0,int y0,int x1,int y1,unsigned int c );
 void DrawRectDim( int x0,int y0,int width,int height,unsigned int c );
+void DrawCircle( int x,int y,int radius,unsigned int c );
