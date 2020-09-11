@@ -26,7 +26,7 @@ void PutPixel(int x, int y, unsigned int color)
 	assert(y >= 0);
 	assert(y < bmpHeight);
 	
-	unsigned long* pixel = (unsigned long*)pBitmap;
+	unsigned int* pixel = (unsigned int*)pBitmap;
 	
   *(pixel + (y * bmpWidth + x)) =  color;
 }
@@ -39,7 +39,7 @@ void StartFrame()
 void EndFrame()
 {	
 	// copy to front buffer
-	StretchDIBits(
+/* 	StretchDIBits(
 		hdc,
 		0,
 		0,
@@ -52,7 +52,20 @@ void EndFrame()
 		pBitmap,
 		&bi,
 		DIB_RGB_COLORS,
-		SRCCOPY);
+		SRCCOPY); */
+	SetDIBitsToDevice(
+		hdc,
+		0,
+		0,
+		bmpWidth,
+		bmpHeight,
+		0,
+		0,
+		0,
+		bmpHeight,
+		pBitmap,
+		&bi,
+		DIB_RGB_COLORS);
 }
 
 void Update()

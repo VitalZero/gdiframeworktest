@@ -5,6 +5,7 @@
 #include <cstdio>
 #include "globals.h"
 #include "graphics.h"
+#include <chrono>
 
 void* pBitmap = nullptr;
 int bmpMemSize = 0;
@@ -16,6 +17,21 @@ BITMAPINFO bi = {0};
 static const char* CLASS_NAME = "gditest";
 static const char* WND_NAME = "GDI test";
 static PAINTSTRUCT ps;
+
+void PrintFPS(HWND hwnd)
+{
+	static auto oldTime = std::chrono::steady_clock::now();
+	static int fps; fps++;
+	
+	if ((std::chrono::steady_clock::now() - oldTime) >= std::chrono::seconds{ 1 }) 
+	{
+		oldTime = std::chrono::steady_clock::now();
+		char buffer[20] = {0};
+		sprintf(buffer, "%s - %d", WND_NAME, fps);
+		SetWindowText(hwnd, buffer);
+		fps = 0;
+	}
+}
 
 void Go()
 {
@@ -63,21 +79,8 @@ int WINAPI WinMain(
 			break;
 		}
 		
-		start = clock();
-		
 		Go();
-		
-		end = clock() - start;
-		
-		if(end > 0)
-		{
-			fps = (float)(CLOCKS_PER_SEC / end);
-		}
-		
-		char buffer[60] = {0};
-		sprintf(buffer, "%s - FPS: %.2f", WND_NAME, fps);
-		SetWindowText(hwnd, buffer);
-		
+		PrintFPS(hwnd);		
 	}
 	
 	return msg.wParam;
