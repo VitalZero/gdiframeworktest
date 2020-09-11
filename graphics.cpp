@@ -39,6 +39,7 @@ void StartFrame()
 void EndFrame()
 {	
 	// copy to front buffer
+	
 /* 	StretchDIBits(
 		hdc,
 		0,
@@ -98,16 +99,8 @@ void Update()
 
 void Render()
 {	
-/* 	for(int y = 0; y < bmpHeight; ++y)
-	{
-		for(int x = 0; x < bmpWidth; ++x)
-		{
-			PutPixel(x, y, RGB(rand() % 256, rand() % 256, rand() % 256));
-		}
-	} */
-	unsigned int color = rand() % 0xFFFFFF;
+	unsigned int color = 0xFFFFFF;
 	DrawRectDim(x, y, 100, 100, color);
-	//DrawCircle(x, y, 50, color);
 }
 
 void DrawRect( int x0,int y0,int x1,int y1, unsigned int c )
