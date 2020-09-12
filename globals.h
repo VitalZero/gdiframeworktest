@@ -1,6 +1,6 @@
 #pragma once
 // globals
-extern void* pBitmap;
+extern unsigned int* pBitmap; // changed from void*
 extern int bmpMemSize;
 extern int bmpWidth;
 extern int bmpHeight;

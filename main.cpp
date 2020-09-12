@@ -7,7 +7,7 @@
 #include "graphics.h"
 #include <chrono>
 
-void* pBitmap = nullptr;
+unsigned int* pBitmap = nullptr; // changed from void*
 int bmpMemSize = 0;
 int bmpWidth = 0;
 int bmpHeight = 0;
@@ -147,12 +147,12 @@ LRESULT CALLBACK WndProc(HWND hwnd, UINT msg, WPARAM wparam, LPARAM lparam)
 			
 			bmpMemSize = bmpWidth * bmpHeight * bpp;
 			
-			pBitmap = VirtualAlloc(0, bmpMemSize, MEM_COMMIT, PAGE_READWRITE);
+			pBitmap = (unsigned int*)VirtualAlloc(0, bmpMemSize, MEM_COMMIT, PAGE_READWRITE);
 		}
 			return 0;
 			
 		case WM_DESTROY:
-			VirtualFree(pBitmap, bmpMemSize, MEM_DECOMMIT);
+			VirtualFree((void*)pBitmap, bmpMemSize, MEM_DECOMMIT);
 			ReleaseDC(hwnd, hdc);
 			PostQuitMessage(0);
 			return 0;

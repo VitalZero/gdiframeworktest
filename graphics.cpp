@@ -11,7 +11,6 @@ static int x = 0;
 static int y = 0;
 static int dirx = 1;
 static int diry = 1;
-unsigned int* pixel = nullptr;
 
 void swap(int& a, int& b)
 {
@@ -27,13 +26,12 @@ void PutPixel(int x, int y, unsigned int color)
 	assert(y >= 0);
 	assert(y < bmpHeight);
 	
-	pixel = (unsigned int*)pBitmap;
-	pixel[y * bmpWidth + x] = color;
+	pBitmap[y * bmpWidth + x] = color;
 }
 
 void StartFrame()
 {
-	memset(pBitmap, 0, bmpMemSize);
+	memset((void*)pBitmap, 0, bmpMemSize);
 }
 
 void EndFrame()
@@ -64,7 +62,7 @@ void EndFrame()
 		0,
 		0,
 		bmpHeight,
-		pBitmap,
+		(void*)pBitmap,
 		&bi,
 		DIB_RGB_COLORS);
 }
@@ -99,7 +97,7 @@ void Update()
 
 void Render()
 {	
-	unsigned int color = 0xFFFFFF;
+	unsigned int color = rand() % 0xFFFFFF;
 	DrawRectDim(x, y, 100, 100, color);
 }
 
